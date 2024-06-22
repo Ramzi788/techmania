@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const LargeCard = () => {
   return (
-    <div className="flex bg-dark_green w-full">
+    <div className="flex bg-dark_green w-full justify-between">
       <div className="flex flex-col w-[750px] pb-12 pl-16 flex-wrap pr-10 max-sm:pl-5 max-sm:gap-8">
         <p className="text-white text-4xl pt-10 w-full break-words leading-relaxed max-340px:text-sm">
           Our Largest Collection Of Laptops Has Arrived

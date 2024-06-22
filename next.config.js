@@ -11,6 +11,9 @@ const nextConfig = {
       "i5.walmartimages.com",
       "www.jarir.com",
       "media.extra.com",
+      "media.ldlc.com",
+      "5.imimg.com",
+      "www.ourfriday.co.uk",
     ],
   },
   // Other configurations can go here

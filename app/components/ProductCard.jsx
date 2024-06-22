@@ -6,20 +6,36 @@ const ProductCard = ({ thumbnail, category, name, price, stock }) => {
     <div className="relative p-3 flex flex-col w-[300px] hover:border border-gray-300 rounded-md group">
       <div className="absolute top-0 left-0 right-0 bottom-10 bg-transparent bg-opacity-100 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="flex flex-between gap-8">
-          <div className="flex items-center justify-center w-12 h-12 bg-white rounded-full border border-blue-700 z-10">
+          <div className="flex items-center justify-center w-12 h-12 bg-white rounded-full border border-blue-700 z-10 relative hover:bg-blue-500">
             <Image
+              className="absolute justify-center transition-opacity duration-1 ease-in-out"
               src="/assets/icons/heart.svg"
               width={23}
               height={23}
               alt="Heart Icon"
             />
-          </div>
-          <div className="flex items-center justify-center w-12 h-12 bg-white rounded-full border border-blue-700 z-10">
             <Image
+              className="absolute justify-center opacity-0 transition-opacity duration-1 ease-in-out hover:opacity-100"
+              src="/assets/icons/heart-fill.svg"
+              width={23}
+              height={23}
+              alt="Filled Heart Icon"
+            />
+          </div>
+          <div className="flex items-center justify-center w-12 h-12 bg-white rounded-full border border-blue-700 z-10 relative hover:bg-blue-500">
+            <Image
+              className="absolute justify-center transition-opacity duration-1 ease-in-out"
               src="/assets/icons/cart-blue.svg"
               width={23}
               height={23}
-              alt="Cart Icon"
+              alt="Heart Icon"
+            />
+            <Image
+              className="absolute justify-center opacity-0 transition-opacity duration-1 ease-in-out hover:opacity-100"
+              src="/assets/icons/shopping-cart-fill.svg"
+              width={23}
+              height={23}
+              alt="Filled Heart Icon"
             />
           </div>
         </div>

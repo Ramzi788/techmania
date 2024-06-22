@@ -38,7 +38,7 @@ const Home = () => {
         <p className="flex max-sm:hidden font-bold text-lg text-black">
           Discover
         </p>
-        <div className="flex w-full max-sm:hidden flex-row gap-8 mt-8 mb-8 max-xl:flex-col  ">
+        <div className="flex w-full max-sm:hidden flex-row gap-3 mt-8 mb-8 max-xl:flex-col flex-between ">
           <div className="xl:flex xl:justify-center xl:md:block hidden">
             <PromotionSquare
               src="/assets/images/sw.svg"
