@@ -1,6 +1,6 @@
 const { Schema, default: mongoose } = require("mongoose");
 
-const favoritesSchema = new Schema(
+const cartSchema = new Schema(
   {
     userId: { type: String, required: true },
     products: [
@@ -8,6 +8,10 @@ const favoritesSchema = new Schema(
         productId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
+        },
+        quantity: {
+          type: Number,
+          required: true,
         },
       },
     ],
@@ -26,5 +30,4 @@ const favoritesSchema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.Favorites ||
-  mongoose.model("Favorites", favoritesSchema);
+export default mongoose.models.Cart || mongoose.model("Cart", cartSchema);

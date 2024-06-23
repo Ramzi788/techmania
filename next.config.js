@@ -14,6 +14,11 @@ const nextConfig = {
       "media.ldlc.com",
       "5.imimg.com",
       "www.ourfriday.co.uk",
+      "images.hindustantimes.com",
+      "store.storeimages.cdn-apple.com",
+      "creatoom.com",
+      "cdn.prod.website-files.com",
+      "i5.walmartimages.com",
     ],
   },
   // Other configurations can go here

@@ -14,6 +14,8 @@ const productSchema = new Schema(
     Display: String,
     Weight: String,
     Thumbnail: String,
+    quantity: Number,
+    type: String,
     additional_images: [{ type: String }],
   },
   { timestamps: true }

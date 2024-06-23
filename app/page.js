@@ -47,7 +47,7 @@ const Home = () => {
                 "Explore our large collection of the best smart watches out there!"
               }
               price={150}
-              href="/productsview/multipleProducts/smartwatches"
+              href="/productsview/multipleProducts/SmartWatches"
             />
           </div>
           <div className="flex flex-col md:block ">
@@ -56,7 +56,7 @@ const Home = () => {
               title={"Apple Iphone 15"}
               desc={"Fill Your Pockets with the Latest Technology"}
               price={900}
-              href="/productsview/multipleProducts/Phones"
+              href="/productsview/multipleProducts/Iphones"
             />
             <div className="xl:hidden max-sm:hidden mt-8 flex flex-row justify-between w-full gap-3">
               <PromotionSquare
@@ -66,7 +66,7 @@ const Home = () => {
                   "Explore our large collection of the best smart watches out there!"
                 }
                 price={150}
-                href="/productsview/multipleProducts/smartwatches"
+                href="/productsview/multipleProducts/Smart Watches"
               />
               <PromotionSquare
                 src="/assets/images/headphones.svg"

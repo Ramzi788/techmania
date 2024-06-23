@@ -8,33 +8,31 @@ import Menu from "@app/components/Menu";
 
 const MultipleProducts = () => {
   const pathname = usePathname();
-  const productType = pathname.substring(
-    pathname.lastIndexOf("/") + 1,
-    pathname.length
-  );
+  const type = pathname.substring(pathname.lastIndexOf("/") + 1);
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filter, setFilter] = useState("");
-
   useEffect(() => {
-    if (productType !== "All") {
-      fetch(`/api/products/${productType}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setProducts(data);
-          setFilteredProducts(data);
-        })
-        .catch((error) => console.error("Error fetching products:", error));
-    } else {
-      fetch(`/api/products/`)
-        .then((res) => res.json())
-        .then((data) => {
-          setProducts(data);
-          setFilteredProducts(data);
-        })
-        .catch((error) => console.error("Error fetching products:", error));
-    }
-  }, [productType]);
+    const fetchProducts = async () => {
+      try {
+        let response;
+        if (type !== "All" && type != "Apple" && type != "Headphones") {
+          response = await fetch(`/api/products/${type}`);
+        } else if (type == "Apple" || type == "Headphones") {
+          response = await fetch(`/api/products/type/${type}`);
+        } else {
+          response = await fetch(`/api/products/`);
+        }
+        const data = await response.json();
+        setProducts(data);
+        setFilteredProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, [type]);
 
   useEffect(() => {
     let sortedProducts = [...products];
@@ -50,16 +48,16 @@ const MultipleProducts = () => {
     setFilter(selectedFilter);
   };
 
-  if (!productType) {
+  if (!type) {
     return <div>Loading...</div>;
   }
 
   return (
     <div className="flex flex-col ">
       <Menu />
-      <div className="pl-16 pr-16 mt-10 max-sm:pl-4 max-sm:pr-4">
+      <div className="pl-16 pr-16 pb-10 mt-10 max-sm:pl-4 max-sm:pr-4">
         <p className="text-2xl font-archivo mb-5 font-bold">
-          {productType === "All" ? productType + " Products" : productType}
+          {type === "All" ? "All Products" : type}
         </p>
         <div className="flex justify-between items-center text-gray-500">
           <p>
@@ -70,6 +68,7 @@ const MultipleProducts = () => {
             <CustomDropdown onFilterChange={handleFilterChange} />
           </div>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-7 max-md:flex max-md:flex-col max-md:items-center">
           {filteredProducts.map((product) => (
             <Link

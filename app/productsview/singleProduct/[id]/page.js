@@ -1,16 +1,33 @@
 "use client";
 import Menu from "@app/components/Menu";
+import ProductCard from "@app/components/ProductCard";
 import Loading from "@app/loading";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Heart from "../../../../public/assets/icons/heart.svg";
+import HeartFill from "../../../../public/assets/icons/heart-fill.svg";
 import React, { useEffect, useState } from "react";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@nextui-org/dropdown";
+import { Button } from "@nextui-org/react";
 
 const ProductsPage = () => {
   const pathname = usePathname();
   const id = pathname.substring(pathname.lastIndexOf("/") + 1, pathname.length);
   const [product, setProduct] = useState(null);
+  const [filter, setFilter] = useState();
   const [mainImage, setMainImage] = useState("");
+  const [products, setProducts] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [selectedKeys, setSelectedKeys] = useState(new Set(["1"]));
+  const [quantity, setQuantity] = useState(1);
+  const [isInCart, setIsInCart] = useState(false);
+  const [isInFavorites, setIsInFavorites] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -25,10 +42,93 @@ const ProductsPage = () => {
     }
   }, [id]);
 
+  useEffect(() => {
+    if (product) {
+      fetch(`/api/products/${product.category}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setProducts(data.filter((p) => p._id !== product._id));
+        })
+        .catch((error) => console.error("Error fetching products:", error));
+    }
+  }, [product]);
+
+  useEffect(() => {
+    const checkCart = async () => {
+      try {
+        const response = await fetch("/api/cart");
+        if (!response.ok) {
+          throw new Error("Failed to fetch cart data");
+        }
+        const cartData = await response.json();
+        const productInCart = cartData.products.some(
+          (item) => item.productId._id === id
+        );
+        setIsInCart(productInCart);
+      } catch (error) {
+        console.error("Error fetching cart data:", error);
+      }
+    };
+
+    checkCart();
+  }, [id]);
+
   const handleImageClick = (url, index) => {
     setMainImage(url);
     setActiveImageIndex(index);
   };
+
+  const handleSelectionChange = (keys) => {
+    const selectedQuantity = Array.from(keys)[0];
+    setSelectedKeys(keys);
+    setQuantity(selectedQuantity);
+  };
+
+  const addToCart = async () => {
+    try {
+      const response = await fetch(`/api/cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productId: id, quantity }),
+      });
+
+      if (response.ok) {
+        console.log("Product added to cart");
+        setIsInCart(true);
+      } else {
+        console.error("Failed to add product to cart");
+      }
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+    }
+  };
+
+  const addToFavorites = async () => {
+    try {
+      const response = await fetch("/api/favorites", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productId: id }),
+      });
+      if (response.ok) {
+        console.log("Product added to favorites");
+        setIsInFavorites(true);
+      } else {
+        console.error("Failed to add product to favorites");
+      }
+    } catch (error) {
+      console.error("Error adding product to favorites:", error);
+    }
+  };
+
+  const selectedValue = React.useMemo(
+    () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
+    [selectedKeys]
+  );
 
   if (!product) {
     return (
@@ -39,7 +139,7 @@ const ProductsPage = () => {
   }
 
   return (
-    <div className="product-detail">
+    <div className="product-detail pb-24">
       <Menu />
       <div className="flex flex-col w-full pl-24 pr-24 max-sm:pl-4 max-sm:pr-4">
         <section className="flex gap-3 align-center mt-10">
@@ -47,14 +147,14 @@ const ProductsPage = () => {
           <div className="border border-r-black border-white "></div>
           <p className="font-bold">{product.name}</p>
         </section>
-        <div className="flex w-full">
-          <div className="flex align-center">
+        <div className="flex w-full max-lg:flex-col">
+          <div className="flex align-center mt-10">
             <div>
-              <div className="flex flex-col mt-5 overflow-y-scroll space-y-4 hide-scrollbar max-h-[450px]">
+              <div className="flex flex-col overflow-y-scroll space-y-4 hide-scrollbar max-h-[450px]">
                 {product.additional_images.map((url, index) => (
                   <div
                     key={index}
-                    className={`w-32 h-32 cursor-pointer p-2 ${
+                    className={`w-32 h-32 cursor-pointer p-2 max-md:w-20 max-md:h-20 ${
                       activeImageIndex === index
                         ? "border-2 rounded-lg border-blue-500"
                         : ""
@@ -73,7 +173,29 @@ const ProductsPage = () => {
                 ))}
               </div>
             </div>
-            <div className="w-[550px]">
+            {isInFavorites}
+            <div className="relative w-[550px] min-w-[400px] max-md:min-w-[200px]">
+              <div className="absolute right-0 top-0 flex items-center justify-center w-12 h-12 bg-white rounded-full border border-blue-700 z-10 hover:bg-blue-500">
+                {isInFavorites ? (
+                  <Image
+                    className="absolute"
+                    src="/assets/icons/heart-fill.svg"
+                    width={23}
+                    height={23}
+                    alt="Filled Heart Icon"
+                    onClick={() => addToFavorites(product._id)}
+                  />
+                ) : (
+                  <Image
+                    className="absolute "
+                    src="/assets/icons/heart (2).svg"
+                    width={23}
+                    height={23}
+                    alt="Heart Icon"
+                    onClick={() => addToFavorites(product._id)}
+                  />
+                )}
+              </div>
               <Image
                 width={300}
                 height={300}
@@ -84,8 +206,10 @@ const ProductsPage = () => {
               />
             </div>
           </div>
-          <div className="mt-12 flex flex-col gap-4 ml-16">
-            <h1 className="text-3xl  font-bold ">{product.name}</h1>
+          <div className="mt-12 flex flex-col gap-4 ml-16 max-md:ml-5">
+            <h1 className="text-3xl  font-bold max-md:text-xl ">
+              {product.name}
+            </h1>
             <hr className="flex w-full border-0.5 border-gray-200" />
             <p className="text-4xl font-bold ">${product.price}</p>
             <div className="flex list-none w-full mt-5 flex-col gap-2">
@@ -95,7 +219,7 @@ const ProductsPage = () => {
                   <p className="flex-1">{product.brand}</p>
                 </div>
               </div>
-              {product.storage != "null" && (
+              {product.storage !== "null" && (
                 <div className="list-item w-full">
                   <div className="flex w-full">
                     <p className="font-bold flex-[0_0_150px]">Storage</p>
@@ -109,7 +233,7 @@ const ProductsPage = () => {
                   <p className="flex-1">{product.weight}</p>
                 </div>
               </div>
-              {product.display != "null" && (
+              {product.display !== "null" && (
                 <div className="list-item w-full">
                   <div className="flex w-full">
                     <p className="font-bold flex-[0_0_150px]">Display</p>
@@ -117,7 +241,7 @@ const ProductsPage = () => {
                   </div>
                 </div>
               )}
-              {product.memory != "null" && (
+              {product.memory !== "null" && (
                 <div className="list-item w-full">
                   <div className="flex w-full">
                     <p className="font-bold flex-[0_0_150px]">Memory (RAM)</p>
@@ -125,7 +249,7 @@ const ProductsPage = () => {
                   </div>
                 </div>
               )}
-              {product.cpu != "null" && (
+              {product.cpu !== "null" && (
                 <div className="list-item w-full">
                   <div className="flex w-full">
                     <p className="font-bold flex-[0_0_150px]">CPU</p>
@@ -134,23 +258,75 @@ const ProductsPage = () => {
                 </div>
               )}
             </div>
+            <div className="flex items-center justify-end gap-4 mt-10">
+              <p>Quantity</p>
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button variant="bordered" className="capitalize">
+                    {selectedValue}
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Single selection example"
+                  variant="flat"
+                  disallowEmptySelection
+                  selectionMode="single"
+                  selectedKeys={selectedKeys}
+                  onSelectionChange={handleSelectionChange}
+                >
+                  {Array.from({ length: product.quantity }, (_, i) => (
+                    <DropdownItem key={i + 1}>{i + 1}</DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
+
+              <button
+                type="submit"
+                onClick={addToCart}
+                className={`flex w-[200px] pl-5 pr-5 pt-2 pb-2 items-center rounded-lg justify-center text-md p-2 max-md:text-xs font-bold ${
+                  isInCart
+                    ? "bg-gray-300 text-gray-700 border border-gray-500 cursor-not-allowed"
+                    : "bg-blue-500 text-white border border-blue-500"
+                }`}
+                disabled={isInCart}
+              >
+                {isInCart ? "Added to Cart" : "Add to Cart"}
+              </button>
+            </div>
           </div>
         </div>
-        <div className="flex align-center">
-          <div className="flex align-center">
-            <div className="flex">
-              <Image
-                src="/assets/icons/minus-circle.svg"
-                width={40}
-                height={40}
-                alt="Minus Circle"
-              />
-            </div>
+
+        {products.length > 0 && (
+          <p className="font-bold mt-10 text-xl">Related Products</p>
+        )}
+        <div className="flex overflow-x-scroll space-x-4 mt-4 pb-12">
+          <div className="flex space-x-4 w-max">
+            {products.length > 0 &&
+              products.map((product) => (
+                <Link
+                  href={`/productsview/singleProduct/${product._id}/`}
+                  key={product._id}
+                >
+                  <ProductCard
+                    thumbnail={product.thumbnail}
+                    category={product.category}
+                    name={product.name}
+                    price={product.price}
+                    stock={product.quantity}
+                  />
+                </Link>
+              ))}
+          </div>
+        </div>
+        <div>
+          <div className="flex items-center gap-10">
+            <p className="font-bold text-xl">Customer Reviews & Ratings</p>
+
             <button
-              type="button"
-              className="flex mt-5 w-[200px] pl-5 pr-5 pt-3 pb-3 items-center justify-center text-white border border-blue-500 bg-blue-500 rounded-full text-md p-2 max-md:text-xs font-bold"
+              type="submit"
+              className="flex w-[200px] pl-5 pr-5 pt-2 pb-2 items-center rounded-lg justify-center text-blue-500 border border-blue-500 text-md p-2 max-md:text-xs font-bold"
             >
-              Shop Now
+              Write a Review
             </button>
           </div>
         </div>
