@@ -93,6 +93,24 @@ const Cart = () => {
       console.error("Error deleting item from cart:", error);
     }
   };
+  const deleteAll = async () => {
+    try {
+      const response = await fetch("/api/cart", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete all items");
+      }
+      const updatedCart = await response.json();
+      setCart(updatedCart);
+    } catch (error) {
+      console.error("Error deleting all items from cart:", error);
+    }
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -103,9 +121,17 @@ const Cart = () => {
       <Menu />
       {cart && cart.products.length > 0 ? (
         <div className="flex flex-col pl-16 pr-16 pt-10">
-          <p className="font-bold text-xl">
-            Cart ({cart.products.length} items)
-          </p>
+          <div className="flex justify-between w-full items-center">
+            <p className="font-bold text-xl">
+              Cart ({cart.products.length} items)
+            </p>
+            <p
+              onClick={() => deleteAll()}
+              className="text-sm underline hover:cursor-pointer"
+            >
+              Delete All Items
+            </p>
+          </div>
           <div className="grid grid-cols-3 mt-10 gap-10">
             <div className="flex col-span-2 flex-col border-1 border-gray-300 rounded-md p-7 h-fit max-h-[500px] overflow-y-auto">
               <p className="text-lg">Items ({cart.products.length})</p>

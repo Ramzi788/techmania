@@ -39,6 +39,7 @@ const PromotionSquare = ({ src, title, desc, price, href }) => {
                     src="/assets/icons/arrow-right.svg"
                     width={24}
                     height={20}
+                    alt="arrow"
                   />
                 </Link>
               </div>

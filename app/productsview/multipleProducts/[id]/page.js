@@ -76,6 +76,7 @@ const MultipleProducts = () => {
               href={`/productsview/singleProduct/${product._id}/`}
             >
               <ProductCard
+                productId={product._id}
                 thumbnail={product.thumbnail}
                 category={product.category}
                 name={product.name}

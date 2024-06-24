@@ -1,7 +1,7 @@
 import Nav from "@/app/components/Nav";
-import "@styles/globals.css";
+import "@/styles/globals.css";
 import OfferBar from "./components/OfferBar";
-import Providers from "./providers";
+import Providers from "./components/Provider";
 
 export const metadata = {
   title: "TechMania",

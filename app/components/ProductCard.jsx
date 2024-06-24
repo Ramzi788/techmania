@@ -13,6 +13,7 @@ const ProductCard = ({
 }) => {
   const [favorites, setFavorites] = useState([]);
   const [cartItems, setCartItems] = useState([]);
+  const [isInFavorites, setIsInFavorites] = useState(false);
 
   const addToCart = async (productId) => {
     try {
@@ -35,24 +36,27 @@ const ProductCard = ({
     }
   };
 
-  const addToFavorites = async (productId) => {
+  const toggleFavorite = async () => {
     try {
-      const response = await fetch(`/api/favorites`, {
-        method: "POST",
+      const response = await fetch("/api/favorites", {
+        method: isInFavorites ? "DELETE" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ productId }),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to add item to favorites");
+      if (response.ok) {
+        setIsInFavorites(!isInFavorites);
+      } else {
+        console.error(
+          `Failed to ${isInFavorites ? "remove from" : "add to"} favorites`
+        );
       }
-
-      // Update favorites state after successful addition
-      setFavorites((prevFavorites) => [...prevFavorites, productId]);
     } catch (error) {
-      console.error("Error adding product to favorites:", error);
+      console.error(
+        `Error ${isInFavorites ? "removing from" : "adding to"} favorites:`,
+        error
+      );
     }
   };
 
@@ -64,7 +68,11 @@ const ProductCard = ({
           throw new Error("Failed to fetch favorites data");
         }
         const data = await response.json();
-        setFavorites(data.products.map((item) => item.productId._id));
+        const favoriteProductIds = data.products.map(
+          (item) => item.productId._id
+        );
+        setFavorites(favoriteProductIds);
+        setIsInFavorites(favoriteProductIds.includes(productId));
       } catch (error) {
         console.error("Error fetching favorites data:", error);
       }
@@ -85,7 +93,7 @@ const ProductCard = ({
 
     fetchFavorites();
     fetchCartItems();
-  }, []);
+  }, [productId]);
 
   return (
     <div className="relative p-3 flex flex-col w-[300px] hover:border border-gray-300 rounded-md group">
@@ -95,12 +103,12 @@ const ProductCard = ({
             className="flex items-center justify-center w-12 h-12 bg-white rounded-full border border-blue-700 z-10 relative"
             onClick={(e) => {
               e.preventDefault();
-              addToFavorites(productId);
+              toggleFavorite();
             }}
           >
-            {favorites.includes(productId) ? (
+            {isInFavorites ? (
               <Image
-                className="absolute justify-center transition-opacity duration-1 ease-in-out cursor-not-allowed"
+                className="absolute justify-center transition-opacity duration-1 ease-in-out"
                 src="/assets/icons/heart-fill-blue.svg"
                 width={23}
                 height={23}
@@ -117,27 +125,31 @@ const ProductCard = ({
             )}
           </div>
           <div
-            className="flex items-center justify-center w-12 h-12 bg-white rounded-full border border-blue-700 z-10 relative hover:bg-blue-500"
+            className={`flex items-center justify-center w-12 h-12 bg-white rounded-full border border-blue-700 z-10 relative ${
+              cartItems.includes(productId) ? "cursor-not-allowed" : ""
+            }`}
             onClick={(e) => {
               e.preventDefault();
-              addToCart(productId);
+              if (!cartItems.includes(productId)) {
+                addToCart(productId);
+              }
             }}
           >
             {cartItems.includes(productId) ? (
               <Image
-                className="absolute justify-center transition-opacity duration-1 ease-in-out cursor-not-allowed"
+                className="absolute justify-center transition-opacity duration-1 ease-in-out"
                 src="/assets/icons/shopping-cart-fill.svg"
                 width={23}
                 height={23}
-                alt="Filled Heart Icon"
+                alt="Filled Cart Icon"
               />
             ) : (
               <Image
                 className="absolute justify-center transition-opacity duration-1 ease-in-out"
-                src="/assets/icons/shopping-cart.svg"
+                src="/assets/icons/shopping-cart-blue.svg"
                 width={23}
                 height={23}
-                alt="Heart Icon"
+                alt="Cart Icon"
               />
             )}
           </div>
