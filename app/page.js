@@ -18,6 +18,7 @@ async function getProducts() {
 
 const Home = () => {
   const [products, setProducts] = useState([]);
+
   useEffect(() => {
     async function fetchProducts() {
       try {
@@ -30,6 +31,7 @@ const Home = () => {
 
     fetchProducts();
   }, []);
+
   return (
     <div className="flex flex-col w-full">
       <Menu />
@@ -54,7 +56,7 @@ const Home = () => {
             <PromotionRect
               src="/assets/images/iphones.svg"
               title={"Apple Iphone 15"}
-              desc={"Fill Your Pockets with the Latest Technology"}
+              desc={"Fill Your Pockets with the Latest Technology of Iphones"}
               price={900}
               href="/productsview/multipleProducts/Iphones"
             />
@@ -96,18 +98,22 @@ const Home = () => {
         <div className="flex overflow-x-scroll space-x-4 mt-4 pb-12">
           <div className="flex space-x-4 w-max">
             {products.map((product) => (
-              <Link
-                href={`/productsview/singleProduct/${product._id}/`}
-                key={product._id}
-              >
-                <ProductCard
-                  thumbnail={product.thumbnail}
-                  category={product.category}
-                  name={product.name}
-                  price={product.price}
-                  stock={product.quantity}
-                />
-              </Link>
+              <div key={product._id}>
+                <Link
+                  href={`/productsview/singleProduct/${product._id}/`}
+                  key={product._id}
+                >
+                  <ProductCard
+                    key={product._id}
+                    productId={product._id}
+                    thumbnail={product.thumbnail}
+                    category={product.category}
+                    name={product.name}
+                    price={product.price}
+                    stock={product.quantity}
+                  />
+                </Link>
+              </div>
             ))}
           </div>
         </div>

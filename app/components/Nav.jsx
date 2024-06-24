@@ -17,7 +17,7 @@ const Nav = () => {
         <SearchBar />
       </div>
       <div className="flex items-center gap-x-4 md:gap-x-10 mt-4 md:mt-0">
-        <Link href="/cart">
+        <Link href="/favorites">
           <Image
             src="/assets/icons/heart (2).svg"
             width={27}

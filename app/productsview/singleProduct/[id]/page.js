@@ -37,6 +37,7 @@ const ProductsPage = () => {
         .then((data) => {
           setProduct(data);
           setMainImage(data.thumbnail);
+          checkFavorite(data._id);
         })
         .catch((error) => console.error("Error fetching product:", error));
     }
@@ -73,6 +74,22 @@ const ProductsPage = () => {
     checkCart();
   }, [id]);
 
+  const checkFavorite = async (productId) => {
+    try {
+      const response = await fetch("/api/favorites");
+      if (!response.ok) {
+        throw new Error("Failed to fetch favorites data");
+      }
+      const favoritesData = await response.json();
+      const productInFavorites = favoritesData.products.some(
+        (item) => item.productId._id === productId
+      );
+      setIsInFavorites(productInFavorites);
+    } catch (error) {
+      console.error("Error fetching favorites data:", error);
+    }
+  };
+
   const handleImageClick = (url, index) => {
     setMainImage(url);
     setActiveImageIndex(index);
@@ -82,6 +99,30 @@ const ProductsPage = () => {
     const selectedQuantity = Array.from(keys)[0];
     setSelectedKeys(keys);
     setQuantity(selectedQuantity);
+  };
+
+  const toggleFavorite = async () => {
+    try {
+      const response = await fetch("/api/favorites", {
+        method: isInFavorites ? "DELETE" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productId: id }),
+      });
+      if (response.ok) {
+        setIsInFavorites(!isInFavorites);
+      } else {
+        console.error(
+          `Failed to ${isInFavorites ? "remove from" : "add to"} favorites`
+        );
+      }
+    } catch (error) {
+      console.error(
+        `Error ${isInFavorites ? "removing from" : "adding to"} favorites:`,
+        error
+      );
+    }
   };
 
   const addToCart = async () => {
@@ -102,26 +143,6 @@ const ProductsPage = () => {
       }
     } catch (error) {
       console.error("Error adding product to cart:", error);
-    }
-  };
-
-  const addToFavorites = async () => {
-    try {
-      const response = await fetch("/api/favorites", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ productId: id }),
-      });
-      if (response.ok) {
-        console.log("Product added to favorites");
-        setIsInFavorites(true);
-      } else {
-        console.error("Failed to add product to favorites");
-      }
-    } catch (error) {
-      console.error("Error adding product to favorites:", error);
     }
   };
 
@@ -173,26 +194,25 @@ const ProductsPage = () => {
                 ))}
               </div>
             </div>
-            {isInFavorites}
             <div className="relative w-[550px] min-w-[400px] max-md:min-w-[200px]">
-              <div className="absolute right-0 top-0 flex items-center justify-center w-12 h-12 bg-white rounded-full border border-blue-700 z-10 hover:bg-blue-500">
+              <div className="absolute right-0 top-0 flex items-center justify-center w-12 h-12 bg-white rounded-full border border-blue-700 z-10 hover:cursor-pointer">
                 {isInFavorites ? (
                   <Image
-                    className="absolute"
-                    src="/assets/icons/heart-fill.svg"
+                    className="absolute transition-opacity duration-1 ease-in-out"
+                    src="/assets/icons/heart-fill-blue.svg"
                     width={23}
                     height={23}
                     alt="Filled Heart Icon"
-                    onClick={() => addToFavorites(product._id)}
+                    onClick={toggleFavorite}
                   />
                 ) : (
                   <Image
-                    className="absolute "
-                    src="/assets/icons/heart (2).svg"
+                    className="absolute transition-opacity duration-1 ease-in-out"
+                    src="/assets/icons/heart.svg"
                     width={23}
                     height={23}
                     alt="Heart Icon"
-                    onClick={() => addToFavorites(product._id)}
+                    onClick={toggleFavorite}
                   />
                 )}
               </div>

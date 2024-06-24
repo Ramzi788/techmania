@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import favorites from "@models/Favorites";
 
 export const POST = async (request) => {
-  const { productId } = await request.json();
+  const { productId, quantity } = await request.json();
 
   try {
     await connectToDB();
@@ -15,7 +15,7 @@ export const POST = async (request) => {
 
     const favorite = await favorites.findOneAndUpdate(
       { userId: "some-user-id" },
-      { $addToSet: { products: { productId } } },
+      { $addToSet: { products: { productId, quantity } } },
       { new: true, upsert: true }
     );
 
@@ -32,9 +32,9 @@ export const POST = async (request) => {
 export const GET = async (request) => {
   try {
     await connectToDB();
-    const favorite = await favorites.findOne({ userId: "some-user-id" }).populate(
-      "products.productId"
-    );
+    const favorite = await favorites
+      .findOne({ userId: "some-user-id" })
+      .populate("products.productId");
     return new NextResponse(JSON.stringify(favorite), {
       status: 200,
     });
@@ -51,18 +51,23 @@ export const DELETE = async (request) => {
   try {
     await connectToDB();
 
-    const favorite = await favorites.findOneAndUpdate(
-      { userId: "some-user-id" },
-      { $pull: { products: { productId: productId } } },
-      { new: true }
-    ).populate("products.productId");
+    const favorite = await favorites
+      .findOneAndUpdate(
+        { userId: "some-user-id" },
+        { $pull: { products: { productId: productId } } },
+        { new: true }
+      )
+      .populate("products.productId");
 
     return new NextResponse(JSON.stringify(favorite), {
       status: 200,
     });
   } catch (error) {
-    return new NextResponse("Error deleting item from favorites: " + error.message, {
-      status: 500,
-    });
+    return new NextResponse(
+      "Error deleting item from favorites: " + error.message,
+      {
+        status: 500,
+      }
+    );
   }
 };
