@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const connectToDB = async () => {
+  if (mongoose.connection.readyState >= 1) {
+    return;
+  }
+
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
@@ -8,7 +12,8 @@ const connectToDB = async () => {
     });
     console.log("Mongo connection successful");
   } catch (error) {
-    throw new Error("Error in connecting to mongodb");
+    console.error("Error in connecting to MongoDB:", error.message);
+    throw new Error("Error in connecting to MongoDB");
   }
 };
 
