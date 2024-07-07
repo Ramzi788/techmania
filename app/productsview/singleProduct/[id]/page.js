@@ -32,7 +32,7 @@ const ProductsPage = () => {
   useEffect(() => {
     if (id) {
       console.log("Fetching product with ID:", id);
-      fetch(`http://localhost:3000/api/${id}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/${id}`)
         .then((res) => res.json())
         .then((data) => {
           setProduct(data);
