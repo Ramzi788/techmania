@@ -10,8 +10,12 @@ import {
 import { Button } from "@nextui-org/react";
 import Image from "next/image";
 import Shopping from "../../public/assets/images/shopping.json";
-import Lottie from "lottie-react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const LottieAnimation = dynamic(() => import("lottie-react"), {
+  ssr: false,
+});
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
@@ -259,7 +263,7 @@ const Cart = () => {
         <div className="flex w-full items-center justify-center h-[600px] mt-5 ">
           <div className="flex flex-col border-1 border-dashed mx-16 py-4 px-4 items-center justify-center border-gray-500 rounded-lg w-full">
             <div className="flex w-[500px] max-sm:hidden">
-              <Lottie animationData={Shopping} />
+              <LottieAnimation animationData={Shopping} />
             </div>
             <p className="font-bold text-lg ">
               Let's Find Your Favorite Products!

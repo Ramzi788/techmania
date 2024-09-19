@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 
 export const POST = async (request) => {
-  const session = await getServerSession({ req: request, ...authOptions });
+  const session = await getServerSession(fromNextRequest(request), authOptions);
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
 
   const { productId, quantity } = await request.json();
@@ -33,7 +33,7 @@ export const POST = async (request) => {
 };
 
 export const GET = async (request) => {
-  const session = await getServerSession({ req: request, ...authOptions });
+  const session = await getServerSession(fromNextRequest(request), authOptions);
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
 
   try {
@@ -50,7 +50,7 @@ export const GET = async (request) => {
 };
 
 export const PUT = async (request) => {
-  const session = await getServerSession({ req: request, ...authOptions });
+  const session = await getServerSession(fromNextRequest(request), authOptions);
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
 
   const { productId, quantity } = await request.json();
@@ -77,7 +77,7 @@ export const PUT = async (request) => {
 };
 
 export const DELETE = async (request) => {
-  const session = await getServerSession({ req: request, ...authOptions });
+  const session = await getServerSession(fromNextRequest(request), authOptions);
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
 
   const { productId } = await request.json();

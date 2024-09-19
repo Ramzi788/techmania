@@ -29,6 +29,12 @@ export const authOptions = {
       return session;
     },
   },
+  session: {
+    strategy: "jwt",
+  },
+  jwt: {
+    secret: process.env.AUTH_SECRET,
+  },
   secret: process.env.AUTH_SECRET,
 };
 
